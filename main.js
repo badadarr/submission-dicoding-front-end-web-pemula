@@ -433,28 +433,21 @@ function updateSubmitButtonLabel() {
 //  FORM VALIDATION (REAL-TIME)
 // =============================================
 
-function setupFormValidation() {
-  const yearInput = document.getElementById("bookFormYear");
-  const yearError = document.getElementById("yearError");
+function attachValidation(
+  titleInput,
+  titleError,
+  authorInput,
+  authorError,
+  yearInput,
+  yearError,
+) {
+  if (!titleInput || !yearInput) return;
 
-  const titleInput = document.getElementById("bookFormTitle");
-  const titleError = document.getElementById("titleError");
-
-  const authorInput = document.getElementById("bookFormAuthor");
-  const authorError = document.getElementById("authorError");
-
-  // Set max attributes dynamically
   const currentYear = new Date().getFullYear();
   yearInput.max = currentYear;
 
-  const editYearInput = document.getElementById("editBookYear");
-  if (editYearInput) editYearInput.max = currentYear;
-
-  // Validasi Tahun (Existing)
   const validateYear = () => {
     const value = parseInt(yearInput.value, 10);
-    const currentYear = new Date().getFullYear();
-
     if (isNaN(value)) {
       yearInput.classList.remove("input-valid", "input-invalid");
       yearError.textContent = "";
@@ -471,11 +464,9 @@ function setupFormValidation() {
       yearInput.setCustomValidity("");
     }
   };
-
   yearInput.addEventListener("input", validateYear);
   yearInput.addEventListener("blur", validateYear);
 
-  // Validasi Kosong untuk Judul
   const validateTitle = () => {
     if (titleInput.value.trim() === "") {
       titleInput.classList.add("input-invalid");
@@ -489,11 +480,9 @@ function setupFormValidation() {
       titleInput.setCustomValidity("");
     }
   };
-
   titleInput.addEventListener("input", validateTitle);
   titleInput.addEventListener("blur", validateTitle);
 
-  // Validasi Kosong untuk Penulis
   const validateAuthor = () => {
     if (authorInput.value.trim() === "") {
       authorInput.classList.add("input-invalid");
@@ -507,9 +496,28 @@ function setupFormValidation() {
       authorInput.setCustomValidity("");
     }
   };
-
   authorInput.addEventListener("input", validateAuthor);
   authorInput.addEventListener("blur", validateAuthor);
+}
+
+function setupFormValidation() {
+  attachValidation(
+    document.getElementById("bookFormTitle"),
+    document.getElementById("titleError"),
+    document.getElementById("bookFormAuthor"),
+    document.getElementById("authorError"),
+    document.getElementById("bookFormYear"),
+    document.getElementById("yearError"),
+  );
+
+  attachValidation(
+    document.getElementById("editBookTitle"),
+    document.getElementById("editTitleError"),
+    document.getElementById("editBookAuthor"),
+    document.getElementById("editAuthorError"),
+    document.getElementById("editBookYear"),
+    document.getElementById("editYearError"),
+  );
 }
 
 function clearFormValidation() {
