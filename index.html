@@ -47,6 +47,7 @@
               data-testid="bookFormAuthorInput"
             />
           </div>
+          <!-- Validasi: tambah span error di bawah input tahun -->
           <div class="form-group">
             <label for="bookFormYear">Tahun</label>
             <input
@@ -56,6 +57,7 @@
               required
               data-testid="bookFormYearInput"
             />
+            <span id="yearError" class="field-error"></span>
           </div>
           <div class="checkbox-row">
             <input
@@ -84,7 +86,7 @@
             <input
               id="searchBookTitle"
               type="text"
-              placeholder="Cari berdasarkan judul..."
+              placeholder="Cari berdasarkan judul... (Ctrl+F)"
               data-testid="searchBookFormTitleInput"
             />
           </div>
@@ -99,16 +101,23 @@
       </section>
 
       <!-- ============ RAK BUKU ============ -->
+      <!-- Badge counter ada di dalam <h2>, diupdate oleh JS -->
       <div class="shelves-grid">
         <section>
-          <h2 class="h2--incomplete">Belum selesai dibaca</h2>
+          <h2 class="h2--incomplete">
+            Belum selesai dibaca
+            <span id="incompleteCount" class="badge">0</span>
+          </h2>
           <div id="incompleteBookList" data-testid="incompleteBookList">
             <!-- book items inserted by JS -->
           </div>
         </section>
 
         <section>
-          <h2 class="h2--complete">Selesai dibaca</h2>
+          <h2 class="h2--complete">
+            Selesai dibaca
+            <span id="completeCount" class="badge">0</span>
+          </h2>
           <div id="completeBookList" data-testid="completeBookList">
             <!-- book items inserted by JS -->
           </div>
@@ -124,7 +133,7 @@
       aria-labelledby="editModalTitle"
     >
       <div class="modal-box">
-        <h2 id="editModalTitle">✏️ Edit Buku</h2>
+        <h2 id="editModalTitle">Edit Buku</h2>
         <form id="editBookForm">
           <input type="hidden" id="editBookId" />
           <div class="form-group">
@@ -150,5 +159,25 @@
         </form>
       </div>
     </div>
+
+    <!-- ============ MODAL KONFIRMASI HAPUS ============ -->
+    <div
+      id="confirmModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirmModalTitle"
+    >
+      <div class="confirm-box">
+        <h3 id="confirmModalTitle">Hapus Buku?</h3>
+        <p id="confirmModalMessage">Tindakan ini tidak dapat dibatalkan.</p>
+        <div class="confirm-actions">
+          <button id="confirmYes">Ya, Hapus</button>
+          <button id="confirmNo">Batal</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ TOAST CONTAINER ============ -->
+    <div class="toast-container" id="toastContainer"></div>
   </body>
 </html>
