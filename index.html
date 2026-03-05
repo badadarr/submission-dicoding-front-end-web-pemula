@@ -40,6 +40,7 @@
               required
               data-testid="bookFormTitleInput"
             />
+            <span id="titleError" class="field-error"></span>
           </div>
           <div class="form-group">
             <label for="bookFormAuthor">Penulis</label>
@@ -50,6 +51,7 @@
               required
               data-testid="bookFormAuthorInput"
             />
+            <span id="authorError" class="field-error"></span>
           </div>
           <!-- Validasi: tambah span error di bawah input tahun -->
           <div class="form-group">
@@ -69,6 +71,7 @@
               type="checkbox"
               data-testid="bookFormIsCompleteCheckbox"
             />
+            <label for="bookFormIsComplete" class="toggle-switch-ui"></label>
             <label for="bookFormIsComplete">Selesai dibaca</label>
           </div>
           <button
@@ -154,6 +157,7 @@
           </div>
           <div class="checkbox-row">
             <input id="editBookIsComplete" type="checkbox" />
+            <label for="editBookIsComplete" class="toggle-switch-ui"></label>
             <label for="editBookIsComplete">Selesai dibaca</label>
           </div>
           <div class="modal-actions">

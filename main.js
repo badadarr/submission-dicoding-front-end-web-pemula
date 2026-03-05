@@ -247,7 +247,11 @@ function handleAddBook(event) {
   const year = parseInt(document.getElementById("bookFormYear").value, 10);
   const isComplete = document.getElementById("bookFormIsComplete").checked;
 
-  if (!title || !author || isNaN(year)) return;
+  const currentYear = new Date().getFullYear();
+  if (!title || !author || isNaN(year) || year < 1000 || year > currentYear) {
+    showToast(`Tahun tidak valid. (Maksimal ${currentYear})`, "error");
+    return;
+  }
 
   /** @type {{id: number, title: string, author: string, year: number, isComplete: boolean}} */
   const newBook = {
@@ -265,7 +269,7 @@ function handleAddBook(event) {
   // Reset form fields
   event.target.reset();
   updateSubmitButtonLabel();
-  clearYearValidation();
+  clearFormValidation();
 
   // #4 — Toast konfirmasi
   showToast(`"${title}" berhasil ditambahkan ke rak!`);
@@ -277,7 +281,8 @@ function handleAddBook(event) {
  * @param {HTMLElement} [el] — elemen card untuk animasi exit sebelum re-render
  */
 function handleToggleComplete(bookId, el) {
-  const book = books.find((b) => b.id === bookId);
+  const id = Number(bookId);
+  const book = books.find((b) => b.id === id);
   if (!book) return;
 
   const doToggle = () => {
@@ -301,14 +306,15 @@ function handleToggleComplete(bookId, el) {
  * @param {number} bookId
  */
 function deleteBook(bookId) {
-  const book = books.find((b) => b.id === bookId);
+  const id = Number(bookId);
+  const book = books.find((b) => b.id === id);
   const titleSnap = book ? book.title : "";
 
   // Find card element for exit animation
-  const el = document.querySelector(`[data-bookid="${bookId}"]`);
+  const el = document.querySelector(`[data-bookid="${id}"]`);
 
   const doDelete = () => {
-    books = books.filter((b) => b.id !== bookId);
+    books = books.filter((b) => b.id !== id);
     saveToStorage();
     renderBooks(getCurrentSearchQuery());
     showToast(`"${titleSnap}" berhasil dihapus.`, "error");
@@ -374,7 +380,11 @@ function handleSaveEdit(event) {
   const year = parseInt(document.getElementById("editBookYear").value, 10);
   const isComplete = document.getElementById("editBookIsComplete").checked;
 
-  if (!title || !author || isNaN(year)) return;
+  const currentYear = new Date().getFullYear();
+  if (!title || !author || isNaN(year) || year < 1000 || year > currentYear) {
+    showToast(`Tahun tidak valid. (Maksimal ${currentYear})`, "error");
+    return;
+  }
 
   book.title = title;
   book.author = author;
@@ -420,50 +430,104 @@ function updateSubmitButtonLabel() {
 }
 
 // =============================================
-//  VALIDASI FORM REAL-TIME
+//  FORM VALIDATION (REAL-TIME)
 // =============================================
 
-function clearYearValidation() {
-  const input = document.getElementById("bookFormYear");
-  const errEl = document.getElementById("yearError");
-  input.classList.remove("input-valid", "input-invalid");
-  if (errEl) errEl.textContent = "";
+function setupFormValidation() {
+  const yearInput = document.getElementById("bookFormYear");
+  const yearError = document.getElementById("yearError");
+
+  const titleInput = document.getElementById("bookFormTitle");
+  const titleError = document.getElementById("titleError");
+
+  const authorInput = document.getElementById("bookFormAuthor");
+  const authorError = document.getElementById("authorError");
+
+  // Set max attributes dynamically
+  const currentYear = new Date().getFullYear();
+  yearInput.max = currentYear;
+
+  const editYearInput = document.getElementById("editBookYear");
+  if (editYearInput) editYearInput.max = currentYear;
+
+  // Validasi Tahun (Existing)
+  const validateYear = () => {
+    const value = parseInt(yearInput.value, 10);
+    const currentYear = new Date().getFullYear();
+
+    if (isNaN(value)) {
+      yearInput.classList.remove("input-valid", "input-invalid");
+      yearError.textContent = "";
+      yearInput.setCustomValidity("");
+    } else if (value < 1000 || value > currentYear) {
+      yearInput.classList.add("input-invalid");
+      yearInput.classList.remove("input-valid");
+      yearError.textContent = `Tahun tidak valid. (Maksimal ${currentYear})`;
+      yearInput.setCustomValidity("Tahun terbit tidak masuk akal.");
+    } else {
+      yearInput.classList.add("input-valid");
+      yearInput.classList.remove("input-invalid");
+      yearError.textContent = "";
+      yearInput.setCustomValidity("");
+    }
+  };
+
+  yearInput.addEventListener("input", validateYear);
+  yearInput.addEventListener("blur", validateYear);
+
+  // Validasi Kosong untuk Judul
+  const validateTitle = () => {
+    if (titleInput.value.trim() === "") {
+      titleInput.classList.add("input-invalid");
+      titleInput.classList.remove("input-valid");
+      titleError.textContent = "Judul buku tidak boleh kosong.";
+      titleInput.setCustomValidity("Judul buku tidak boleh kosong.");
+    } else {
+      titleInput.classList.add("input-valid");
+      titleInput.classList.remove("input-invalid");
+      titleError.textContent = "";
+      titleInput.setCustomValidity("");
+    }
+  };
+
+  titleInput.addEventListener("input", validateTitle);
+  titleInput.addEventListener("blur", validateTitle);
+
+  // Validasi Kosong untuk Penulis
+  const validateAuthor = () => {
+    if (authorInput.value.trim() === "") {
+      authorInput.classList.add("input-invalid");
+      authorInput.classList.remove("input-valid");
+      authorError.textContent = "Penulis buku tidak boleh kosong.";
+      authorInput.setCustomValidity("Penulis buku tidak boleh kosong.");
+    } else {
+      authorInput.classList.add("input-valid");
+      authorInput.classList.remove("input-invalid");
+      authorError.textContent = "";
+      authorInput.setCustomValidity("");
+    }
+  };
+
+  authorInput.addEventListener("input", validateAuthor);
+  authorInput.addEventListener("blur", validateAuthor);
 }
 
-function setupYearValidation() {
-  const input = document.getElementById("bookFormYear");
-  const errEl = document.getElementById("yearError");
-  const currentYear = new Date().getFullYear();
+function clearFormValidation() {
+  const inputs = ["bookFormYear", "bookFormTitle", "bookFormAuthor"];
+  const errors = ["yearError", "titleError", "authorError"];
 
-  // Reset saat input mendapat fokus
-  input.addEventListener("focus", () => {
-    input.classList.remove("input-valid", "input-invalid");
-    if (errEl) errEl.textContent = "";
-  });
-
-  // Validasi real-time saat mengetik
-  input.addEventListener("input", () => {
-    const val = Number(input.value);
-    if (!input.value) {
+  inputs.forEach((id) => {
+    const input = document.getElementById(id);
+    if (input) {
       input.classList.remove("input-valid", "input-invalid");
-      if (errEl) errEl.textContent = "";
-      return;
-    }
-    const isValid = Number.isInteger(val) && val > 0 && val <= currentYear;
-    input.classList.toggle("input-valid", isValid);
-    input.classList.toggle("input-invalid", !isValid);
-    if (errEl) {
-      errEl.textContent = isValid
-        ? ""
-        : `Masukkan tahun antara 1 – ${currentYear}.`;
+      input.setCustomValidity("");
     }
   });
 
-  // Revalidasi saat blur (keluar dari field)
-  input.addEventListener("blur", () => {
-    if (!input.value) {
-      input.classList.add("input-invalid");
-      if (errEl) errEl.textContent = "Tahun wajib diisi!";
+  errors.forEach((id) => {
+    const error = document.getElementById(id);
+    if (error) {
+      error.textContent = "";
     }
   });
 }
@@ -581,8 +645,8 @@ document.addEventListener("DOMContentLoaded", () => {
       hideConfirmModal();
   });
 
-  // #2 — Setup validasi real-time pada field tahun
-  setupYearValidation();
+  // #2 — Setup validasi real-time pada field form
+  setupFormValidation();
 
   // #7 — Keyboard shortcuts
   document.addEventListener("keydown", (e) => {

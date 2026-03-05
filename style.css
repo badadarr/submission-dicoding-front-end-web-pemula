@@ -246,26 +246,71 @@ input.input-invalid {
   margin-top: 1px;
 }
 
+/* ============================
+   FORM — TOGGLE SWITCH (CHECKBOX)
+   ============================ */
 .checkbox-row {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   padding: 5px 0;
 }
+
+/* Sembunyikan checkbox asli rapat-rapat */
 .checkbox-row input[type="checkbox"] {
-  width: 15px;
-  height: 15px;
-  accent-color: var(--clr-text);
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Container Toggle (Track) */
+.toggle-switch-ui {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  background-color: var(--clr-border);
+  border-radius: 99px;
   cursor: pointer;
+  transition: background-color 0.25s ease;
   flex-shrink: 0;
 }
+
+/* Lingkaran Toggle (Thumb) */
+.toggle-switch-ui::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.25s ease;
+}
+
+/* State Checked (ON) */
+.checkbox-row input[type="checkbox"]:checked + .toggle-switch-ui {
+  background-color: var(--clr-success);
+}
+.checkbox-row input[type="checkbox"]:checked + .toggle-switch-ui::after {
+  transform: translateX(16px);
+}
+
+/* Focus Outline untuk Aksesibilitas */
+.checkbox-row input[type="checkbox"]:focus-visible + .toggle-switch-ui {
+  outline: 2px solid var(--clr-border-focus);
+  outline-offset: 2px;
+}
+
 .checkbox-row label {
   font-size: 0.86rem;
   font-weight: 500;
   color: var(--clr-text);
-  text-transform: none;
-  letter-spacing: 0;
   cursor: pointer;
+  user-select: none;
 }
 
 #bookFormSubmit {
@@ -547,6 +592,55 @@ input.input-invalid {
   background: var(--clr-success-bg);
   color: var(--clr-success);
   border-color: var(--clr-success);
+}
+/* Toggle Switch — isComplete */
+.toggle-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  border: none;
+  padding: 3px 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.toggle-switch__track {
+  width: 32px;
+  height: 18px;
+  border-radius: 99px;
+  background: var(--clr-border);
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.22s ease;
+}
+.toggle-switch__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.22s ease;
+}
+.toggle-switch--on .toggle-switch__track {
+  background: var(--clr-success);
+}
+.toggle-switch--on .toggle-switch__thumb {
+  transform: translateX(14px);
+}
+.toggle-switch__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--clr-text-muted);
+  transition: color 0.18s ease;
+}
+.toggle-switch--on .toggle-switch__label {
+  color: var(--clr-success);
+}
+.toggle-switch:hover .toggle-switch__track {
+  opacity: 0.85;
 }
 [data-testid="bookItemDeleteButton"] {
   background: var(--clr-danger-bg);
