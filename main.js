@@ -469,10 +469,58 @@ function setupYearValidation() {
 }
 
 // =============================================
+//  THEME TOGGLE (Light / Dark)
+// =============================================
+
+const THEME_KEY = "BOOKSHELF_THEME";
+
+/** Terapkan tema ke <html> dan update label tombol */
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  const icon = document.querySelector("#themeToggle .theme-icon");
+  const label = document.querySelector("#themeToggle .theme-label");
+  if (theme === "dark") {
+    if (icon) icon.textContent = "🌙";
+    if (label) label.textContent = "Dark";
+  } else {
+    if (icon) icon.textContent = "☀️";
+    if (label) label.textContent = "Light";
+  }
+}
+
+/** Toggle antara light dan dark, lalu simpan preferensi */
+function handleThemeToggle() {
+  const current =
+    document.documentElement.getAttribute("data-theme") || "light";
+  const next = current === "dark" ? "light" : "dark";
+  applyTheme(next);
+  localStorage.setItem(THEME_KEY, next);
+}
+
+/** Muat preferensi tema dari localStorage (atau ikuti system preference) */
+function loadTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved) {
+    applyTheme(saved);
+  } else {
+    // Ikuti preferensi sistem operasi user
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    ).matches;
+    applyTheme(prefersDark ? "dark" : "light");
+  }
+}
+
+// =============================================
 //  INIT
 // =============================================
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Load tema sebelum konten lain agar tidak ada flash
+  loadTheme();
+  document
+    .getElementById("themeToggle")
+    .addEventListener("click", handleThemeToggle);
   // Load data
   loadFromStorage();
   renderBooks();
